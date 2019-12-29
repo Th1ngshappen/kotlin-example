@@ -6,8 +6,6 @@ import java.lang.IllegalArgumentException
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.SecureRandom
-import java.util.*
-import java.util.concurrent.RecursiveTask
 
 class User private constructor(
     private val firstName: String,
@@ -59,6 +57,7 @@ class User private constructor(
         password: String
     ) : this(firstName, lastName, email = email, meta = mapOf("auth" to "password")) {
         println("Secondary mail constructor")
+        salt = getSomeSalt()
         passwordHash = encrypt(password)
     }
 
@@ -69,7 +68,7 @@ class User private constructor(
         rawPhone: String
     ) : this(firstName, lastName, rawPhone = rawPhone, meta = mapOf("auth" to "sms")) {
         println("Secondary phone constructor")
-        salt = ByteArray(16).also { SecureRandom().nextBytes(it) }.toString()
+        salt = getSomeSalt()
         setupAccessCode(rawPhone)
     }
 
@@ -136,6 +135,8 @@ class User private constructor(
         if (checkPassword(oldPass)) passwordHash = encrypt(newPass)
         else throw IllegalArgumentException("The entered password does not match the current password")
     }
+
+    private fun getSomeSalt() = ByteArray(16).also { SecureRandom().nextBytes(it) }.toString()
 
     // никогда не используйте хэширование по простому алгоритму, здесь для лучшего шифрования добавлена "соль"
     private fun encrypt(password: String): String = salt.plus(password).md5()

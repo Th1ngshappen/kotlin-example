@@ -58,7 +58,7 @@ object UserHolder {
                     val (firstName, lastName) = it[0]!!.fullNameToPair()
                     val salt = it[2]!!.dropLast(33)
                     val pswHash = it[2]!!.takeLast(32)
-                    val user = User(firstName, lastName, it[1] ?: "", salt, pswHash, it[3])
+                    val user = User(firstName, lastName, it[1] , salt, pswHash, it[3])
                     userList.add(user)
                     map[user.login] = user
                 }
